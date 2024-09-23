@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  kalmia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kalmia-app-image
+    ports:
+      - "${PORT:-2727}:2727"
+    volumes:
+      - app-data:/app
+      - ./config.json:/app/config.json  
+    environment:
+      - DATABASE_TYPE=postgres
+      - DATABASE_HOST=postgres
+      - DATABASE_USER=${SERVICE_USER_POSTGRES}  
+      - DATABASE_NAME=kalmia
+      - DATABASE_PASSWORD=${SERVICE_PASSWORD_POSTGRES}  
+      - SERVICE_FQDN_KALMIA=http://kalmia.${SERVICE_FQDN_APP}:2727  
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:2727"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+  postgres:
+    image: postgres:15
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}  
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}  
+      - POSTGRES_DB=kalmia
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+volumes:
+  app-data:
+  postgres-data:
