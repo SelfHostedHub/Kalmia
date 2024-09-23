@@ -9,8 +9,7 @@ services:
     ports:
       - "${PORT:-2727}:2727"
     volumes:
-      - app-data:/app
-      - ./config.json:/app/config.json  
+      - ./config.json:/app/config.json
     environment:
       - DATABASE_TYPE=postgres
       - DATABASE_HOST=postgres
@@ -42,5 +41,4 @@ services:
       retries: 10
 
 volumes:
-  app-data:
   postgres-data:
