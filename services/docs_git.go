@@ -86,6 +86,7 @@ func (service *DocService) GitDeploy(docId uint) error {
 			Password: doc.GitPassword,
 		},
 	})
+
 	if err != nil && err != git.NoErrAlreadyUpToDate {
 		return fmt.Errorf("failed to fetch from remote: %v", err)
 	}
@@ -125,6 +126,7 @@ func (service *DocService) GitDeploy(docId uint) error {
 		Commit: remoteRef.Hash(),
 		Mode:   git.HardReset,
 	})
+
 	if err != nil {
 		return fmt.Errorf("failed to reset branch to match remote: %v", err)
 	}

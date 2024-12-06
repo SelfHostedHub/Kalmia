@@ -101,6 +101,12 @@ func main() {
 	docsRouter.HandleFunc("/documentation/reorder-bulk", func(w http.ResponseWriter, r *http.Request) { handlers.BulkReorderPageOrPageGroup(dS, w, r) }).Methods("POST")
 	docsRouter.HandleFunc("/documentation/root-parent-id", func(w http.ResponseWriter, r *http.Request) { handlers.GetRootParentId(dS, w, r) }).Methods("GET")
 
+	importRouter := docsRouter.PathPrefix("/import").Subrouter()
+	importRouter.Use(middleware.EnsureAuthenticated(aS))
+	importRouter.HandleFunc("/gitbook", func(w http.ResponseWriter, r *http.Request) {
+		handlers.ImportGitbook(serviceRegistry, w, r, config.ParsedConfig)
+	}).Methods("POST")
+
 	docsRouter.HandleFunc("/pages", func(w http.ResponseWriter, r *http.Request) { handlers.GetPages(dS, w, r) }).Methods("GET")
 	docsRouter.HandleFunc("/page", func(w http.ResponseWriter, r *http.Request) { handlers.GetPage(dS, w, r) }).Methods("POST")
 	docsRouter.HandleFunc("/page/create", func(w http.ResponseWriter, r *http.Request) { handlers.CreatePage(serviceRegistry, w, r) }).Methods("POST")
@@ -139,7 +145,8 @@ func createSPAHandler() http.HandlerFunc {
 		path := r.URL.Path
 
 		if path == "/" {
-			path = "index.html"
+			http.Redirect(w, r, "/admin", http.StatusFound)
+			return
 		}
 
 		if config.ParsedConfig.Environment != "dev" {

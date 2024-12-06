@@ -14,8 +14,10 @@ export function pageSizes(): number[] {
 
 export const languages: { code: string; lang: string }[] = [
   { code: "en", lang: "English" },
+  { code: "de", lang: "Deutsch" },
   { code: "ml", lang: "Malayalam" },
   { code: "hi", lang: "Hindi" },
+  { code: "zh", lang: "Chinese" },
 ];
 
 export const getLanguageName = (): string => {
